@@ -13,7 +13,6 @@ def main():
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("PACXON")
     clock = pygame.time.Clock()
-
     game_engine = GameEngine()
     game_engine.run(screen, clock, SCREEN_WIDTH, SCREEN_HEIGHT)
 

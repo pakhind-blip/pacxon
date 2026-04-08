@@ -97,11 +97,13 @@ class GameEngine:
         )
         self.player.set_position(0, 0)
 
-        self.grid_manager = GridManager(grid_width, grid_height, self.player, self.block_size)
+        self.grid_manager = GridManager(grid_width, grid_height, self.player,self, self.block_size)
 
         self.ghosts = [
         GhostBouncer(10, 10, self.block_size),
-        GhostClimber(0, 10, self.block_size) # Starts on border
+        GhostBouncer(10, 10, self.block_size),
+        GhostClimber(0, 10, self.block_size),
+        GhostClimber(0, 20, self.block_size) # Starts on border
         ]
 
     def _reset_game(self) -> None:

@@ -1,16 +1,17 @@
 import pygame
 from components.player import Player
 from collections import deque
-
+ 
 
 class GridManager:
-    def __init__(self, width: int, height: int, player: Player, block_size: int = 20):
+    def __init__(self, width: int, height: int, player: Player,gameEngine , block_size: int = 20):
         self.width = width
         self.height = height
         self.block_size = block_size
         self.grid = self._create_grid()
         self.player = player
         self.captured_area = 0.0
+        self.gameEngine = gameEngine
         self.trail = []
         self.start_position = (-1, -1)
         self._apply_border()
@@ -120,9 +121,47 @@ class GridManager:
                     visited_outside.add((nx, ny))
                     outside_queue.append((nx, ny))
 
+        can_ghost_lock_grid = set()
+
+        ghosts = self.gameEngine.ghosts
+        def bfs_from_ghost( start_x, start_y, visited_outside, border_set):
+            queue = deque()
+            visited = set()
+
+            queue.append((start_x, start_y))
+            visited.add((start_x, start_y))
+
+            directions = [(1,0), (-1,0), (0,1), (0,-1)]
+
+            while queue:
+                x, y = queue.popleft()
+
+                for dx, dy in directions:
+                    nx, ny = x + dx, y + dy
+                    if (nx, ny) not in visited:
+                        if 0 <= nx < len(self.grid[0]) and 0 <= ny < len(self.grid):
+
+                            # ❗ only move inside candidate area
+                            if (nx, ny) not in visited_outside and (nx, ny) not in border_set and self.get_grid()[ny][nx] == 0:
+                                visited.add((nx, ny))
+                                queue.append((nx, ny))
+
+            return visited
+        for g in ghosts:
+            gx = int(g.x // self.block_size)
+            gy = int(g.y // self.block_size)
+
+            # ghost must be inside candidate area
+            if (gx, gy) not in visited_outside and (gx, gy) not in border_set:
+                
+                reachable = bfs_from_ghost(gx, gy, visited_outside, border_set)
+                can_ghost_lock_grid.update(reachable)
+        
+        
         for y in range(min_y, max_y + 1):
             for x in range(min_x, max_x + 1):
-                if (x, y) not in visited_outside and (x, y) not in border_set:
+                # for all ghost if in that gird dont change anything include alreay change grid draw only traillin 
+                if (x, y) not in visited_outside and (x, y) not in border_set and (x,y) not in can_ghost_lock_grid:                    
                     self.grid[y][x] = 1
 
         self.start_position = (-1, -1)
