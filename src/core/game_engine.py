@@ -2,6 +2,7 @@ import pygame
 
 from core.grid_manager import GridManager
 from components.player import Player
+from components.ghosts import GhostBouncer, GhostClimber
 
 # Game state constants
 MENU = 0
@@ -22,6 +23,7 @@ class GameEngine:
         self.level = 1
         self.player = None
         self.grid_manager = None
+        self.ghosts = []
         self.screen = None
         self.clock = None
         self.screen_width = 800
@@ -97,6 +99,11 @@ class GameEngine:
 
         self.grid_manager = GridManager(grid_width, grid_height, self.player, self.block_size)
 
+        self.ghosts = [
+        GhostBouncer(10, 10, self.block_size),
+        GhostClimber(0, 10, self.block_size) # Starts on border
+        ]
+
     def _reset_game(self) -> None:
         """Reset game to initial state."""
         self.player.set_position(0, 0)
@@ -152,6 +159,10 @@ class GameEngine:
         # Draw HUD
         self._draw_hud()
 
+        for ghost in self.ghosts:
+            ghost.update(self.grid_manager)
+            ghost.draw(self.screen)
+    
         self.handle_collisions()
 
         # Check for level completion (80% coverage)
@@ -195,11 +206,36 @@ class GameEngine:
         self.screen.blit(restart_text, (self.screen_width // 2 - restart_text.get_width() // 2, 350))
 
     def handle_collisions(self) -> None:
-        """Manage collision events.
+        player_pos = self.player.get_position()
+        
+        for ghost in self.ghosts:
+            # 1. Ghost hits Player directly
+            if ghost.is_collision(player_pos[0], player_pos[1]):
+                self._player_hit()
+                return
 
-        Checks for collisions between player, ghosts, and trails.
-        """
-        pass
+            # 2. Ghost hits the Player's Trail (value 2 in grid)
+            # Check the grid cell the ghost is currently occupying
+            gx = int(ghost.x // self.block_size)
+            gy = int(ghost.y // self.block_size)
+            if self.grid_manager.get_cell(gx, gy) == 2:
+                self._player_hit()
+                return
+
+    def _player_hit(self):
+        lives = self.player.lose_life()
+        if lives > 0:
+            self.player.set_position(0, 0)
+            # Clear current trail so player isn't stuck in a death loop
+            self.grid_manager.trail.clear()
+            self.grid_manager.start_position = (-1,-1)
+            # Clear value 2 (trail) from grid
+            for y in range(self.grid_manager.height):
+                for x in range(self.grid_manager.width):
+                    if self.grid_manager.grid[y][x] == 2:
+                        self.grid_manager.grid[y][x] = 0
+        else:
+            self.update_game_state(GAME_OVER)
 
     def update_game_state(self, new_state: int) -> None:
         """Control transitions between game states.
