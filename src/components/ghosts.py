@@ -22,10 +22,12 @@ class Ghost(GameObject, Collision):
                 self.y < py + self.block_size and
                 self.y + self.height > py)
 
-    def draw(self, surface):
-        pygame.draw.circle(surface, self.color,
-                           (int(self.x + self.width // 2), int(self.y + self.height // 2)),
-                           self.width // 2)
+    def draw(self, surface, offset_y: int = 0):
+            # Render the ghost with the vertical offset
+            pygame.draw.circle(surface, self.color,
+                            (int(self.x + self.width // 2), 
+                                int(self.y + self.height // 2 + offset_y)),
+                            self.width // 2)
 
 
 class GhostBouncer(Ghost):

@@ -1,8 +1,6 @@
 import pygame
 import sys
-
-from core.game_engine import GameEngine, MENU, PLAY, GAME_OVER
-
+from core.game_engine import GameEngine
 
 def main():
     pygame.init()
@@ -18,7 +16,6 @@ def main():
 
     pygame.quit()
     sys.exit()
-
 
 if __name__ == "__main__":
     main()
