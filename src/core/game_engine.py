@@ -8,12 +8,13 @@ from core.menu import Menu  # Ensure this path is correct
 MENU = 0
 PLAY = 1
 GAME_OVER = 2
+COMPLETE = 3
+
 
 class GameEngine:
     def __init__(self):
         self.game_state = MENU
         self.score = 0
-        self.level = 1
         self.player = None
         self.grid_manager = None
         self.ghosts = []
@@ -24,6 +25,15 @@ class GameEngine:
         self.block_size = 20
         self.HUD_HEIGHT = 60 
         self.menu_system = None # Initialized in run()
+        self.leveldata  = {
+            # 1: [ GhostBouncer(10, 10, self.block_size),GhostBouncer(20, 20, self.block_size) , GhostBouncer(30, 30, self.block_size) , GhostClimber(39, 12, self.block_size), GhostClimber(0, 12, self.block_size)],
+            1 : [ GhostBouncer(10, 10, self.block_size) ],
+            2: [ GhostBouncer(10, 10, self.block_size), GhostBouncer(20, 20, self.block_size)],
+            3 : [ GhostBouncer(10, 10, self.block_size), GhostBouncer(20, 20, self.block_size) , GhostClimber(0, 10, self.block_size)],
+            4 : [  GhostBouncer(10, 10, self.block_size), GhostBouncer(20, 20, self.block_size) , GhostClimber(0, 12, self.block_size), GhostClimber(39, 12, self.block_size) ],
+            5:  [ GhostBouncer(10, 10, self.block_size),GhostBouncer(20, 20, self.block_size) , GhostBouncer(30, 30, self.block_size) , GhostClimber(39, 12, self.block_size), GhostClimber(0, 12, self.block_size)] 
+            }
+        self.level = 1
 
     def run(self, screen, clock, screen_width: int, screen_height: int) -> None:
         self.screen = screen
@@ -48,7 +58,8 @@ class GameEngine:
                 self._play_mode()
             elif self.game_state == GAME_OVER:
                 self._game_over_mode()
-
+            elif self.game_state == COMPLETE:
+                self._game_complete_mode()
             pygame.display.flip()
             self.clock.tick(60)
 
@@ -65,6 +76,9 @@ class GameEngine:
             if event.key == pygame.K_r:
                 self._reset_game()
         elif self.game_state == GAME_OVER:
+            if event.key == pygame.K_SPACE:
+                self._start_game()
+        elif self.game_state == COMPLETE:
             if event.key == pygame.K_SPACE:
                 self._start_game()
 
@@ -87,23 +101,11 @@ class GameEngine:
 
         self.grid_manager = GridManager(grid_width, grid_height, self.player, self, self.block_size)
 
-        self.ghosts = [
-            GhostBouncer(10, 10, self.block_size),
-            GhostBouncer(20, 15, self.block_size),
-            GhostClimber(0, 10, self.block_size),
-            GhostClimber(0, 20, self.block_size)
-        ]
+        self.ghosts = self.leveldata[self.level]
 
     def _reset_game(self) -> None:
         self.player.set_position(0, 0)
         self.player.lives = 3
-        self.player.is_trailing = False
-        self.grid_manager.reset()
-
-    def _advance_level(self) -> None:
-        self.level += 1
-        self.score += 1000
-        self.player.set_position(0, 0)
         self.player.is_trailing = False
         self.grid_manager.reset()
 
@@ -124,6 +126,20 @@ class GameEngine:
         font_restart = pygame.font.Font(None, 36)
         restart_text = font_restart.render("Press SPACE to try again", True, (200, 200, 200))
         self.screen.blit(restart_text, (self.screen_width // 2 - restart_text.get_width() // 2, 450))
+        
+    def _game_complete_mode(self) -> None:
+        self.screen.fill((0, 0, 0))
+        font_title = pygame.font.Font(None, 80)
+        title = font_title.render("GAME COMPLETE", True, (50, 255, 50))
+        self.screen.blit(title, (self.screen_width // 2 - title.get_width() // 2, 150))
+        font_stats = pygame.font.Font(None, 48)
+        score_text = font_stats.render(f"Final Score: {self.score}", True, (255, 255, 255))
+        # level_text = font_stats.render(f"Final Level: {self.level}", True, (255, 255, 255))
+        self.screen.blit(score_text, (self.screen_width // 2 - score_text.get_width() // 2, 250))
+        # self.screen.blit(level_text, (self.screen_width // 2 - level_text.get_width() // 2, 310))
+        font_restart = pygame.font.Font(None, 36)
+        restart_text = font_restart.render("Press SPACE to try again", True, (200, 200, 200))
+        self.screen.blit(restart_text, (self.screen_width // 2 - restart_text.get_width() // 2, 450))
 
     def _play_mode(self) -> None:
         keys = pygame.key.get_pressed()
@@ -140,7 +156,7 @@ class GameEngine:
         self._draw_hud()
         coverage = self.grid_manager.calculate_coverage()
         if coverage >= 80.0:
-            self._advance_level()
+            self.change_level()
         if self.player.lives <= 0:
             self.update_game_state(GAME_OVER)
 
@@ -182,6 +198,19 @@ class GameEngine:
                         self.grid_manager.grid[y][x] = 0
         else:
             self.update_game_state(GAME_OVER)
+        return
 
     def update_game_state(self, new_state: int) -> None:
         self.game_state = new_state
+        
+    def change_level(self) -> None:
+        if self.level >= 5:
+            self.update_game_state(COMPLETE)
+        else:
+            self.player.lives = 3
+            self.level += 1
+            self.player.set_position(0, 0)
+            self.player.is_trailing = False
+            self.grid_manager.reset()
+            self.ghosts = self.leveldata[min(self.level,5)]
+            

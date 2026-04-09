@@ -5,7 +5,7 @@ from core.collision import Collision
 LEFT, RIGHT, UP, DOWN = 0, 1, 2, 3
 
 class Player(GameObject, Collision):
-    def __init__(self, width: int = 20, height: int = 20, block_size: int = 20, move_delay: int = 8):
+    def __init__(self, width: int = 20, height: int = 20, block_size: int = 20, move_delay: int = 8,iframe_color=(255, 0, 0)):
         super().__init__(x=0.0, y=0.0, color=(255, 255, 0), speed=1.0)
         self.width = width
         self.height = height
@@ -20,6 +20,9 @@ class Player(GameObject, Collision):
         self.lerp_speed = 0.6 
         self.lives = 3
         self.is_trailing = False
+        self.is_iframe = False
+        self.iframe_time = 60
+        self.iframe_color = iframe_color
 
     def is_collision(self, x: int, y: int) -> bool:
         return (self.x < x + self.width and self.x + self.width > x and
@@ -64,6 +67,10 @@ class Player(GameObject, Collision):
         self.target_y = self.grid_y * self.block_size
 
     def update(self) -> None:
+        if self.is_iframe:
+            self.iframe_time -= 1
+            if self.iframe_time <= 0:
+                self.is_iframe = False
         self.x += (self.target_x - self.x) * self.lerp_speed
         self.y += (self.target_y - self.y) * self.lerp_speed
 
@@ -88,7 +95,10 @@ class Player(GameObject, Collision):
         self.target_y = self.grid_y * self.block_size
 
     def draw(self, surface, offset_y: int = 0) -> None:
-        pygame.draw.rect(surface, self.color, (self.x, self.y + offset_y, self.width, self.height))
+        if self.is_iframe:
+            pygame.draw.rect(surface, self.iframe_color, (self.x, self.y + offset_y, self.width, self.height))
+        else:
+            pygame.draw.rect(surface, self.color, (self.x, self.y + offset_y, self.width, self.height))
 
     def set_position(self, x: int, y: int) -> None:
         self.grid_x, self.grid_y = x, y
@@ -97,6 +107,14 @@ class Player(GameObject, Collision):
 
     def get_position(self) -> tuple: return (self.x, self.y)
     def get_grid_position(self) -> tuple: return (self.grid_x, self.grid_y)
+
     def lose_life(self) -> int:
+        if self.is_iframe:
+            return self.lives
+
         self.lives -= 1
+        self.is_iframe = True
+        self.iframe_time = 60  # 3 seconds at 60 FPS
+        self.is_trailing = False
+
         return self.lives

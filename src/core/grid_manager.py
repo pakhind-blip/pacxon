@@ -12,6 +12,7 @@ class GridManager:
         self.gameEngine = gameEngine
         self.trail = []
         self.start_position = (-1, -1)
+        self.before_postition = (0,0)
         self._apply_border()
 
     def _create_grid(self) -> list[list[int]]:
@@ -38,13 +39,17 @@ class GridManager:
         if self.grid[grid_y][grid_x] == 0:
             self.grid[grid_y][grid_x] = 2
             if self.start_position == (-1, -1):
-                self.start_position = (grid_x, grid_y)
+                self.start_position = self.before_postition 
                 self.player.is_trailing = True
+                
             self.trail.append((grid_x, grid_y))
-        elif self.grid[grid_y][grid_x] == 1 and self.start_position != (-1, -1):
-            end_position = (grid_x, grid_y)
-            self.player.is_trailing = False
-            self.flood_fill(end_position[0], end_position[1])
+        elif self.grid[grid_y][grid_x] == 1 :
+            if self.start_position != (-1, -1) :
+                end_position = (grid_x, grid_y)
+                self.player.is_trailing = False
+                self.flood_fill(end_position[0], end_position[1])
+            else:
+                self.before_postition = (grid_x, grid_y)
         self.calculate_coverage()
 
     def flood_fill(self, end_x: int, end_y: int) -> None:
@@ -55,7 +60,9 @@ class GridManager:
 
         queue = deque([(end_x, end_y, [])])
         visited = {(end_x, end_y)}
-        trail_without_start = [p for p in self.trail if p != self.start_position]
+        # trail_without_start = [p for p in self.trail if p != self.start_position]
+        # (x,y) start - all direct
+        
 
         shortest_path = []
         while queue:
@@ -63,10 +70,11 @@ class GridManager:
             if x == start_x and y == start_y:
                 shortest_path = path + [(x, y)]
                 break
+            
             for dx, dy in directions:
                 nx, ny = x + dx, y + dy
                 if (0 <= nx < cols and 0 <= ny < rows and (nx, ny) not in visited and
-                        self.grid[ny][nx] != 0 and (nx, ny) not in trail_without_start):
+                        self.grid[ny][nx] != 0 and (nx, ny) not in self.trail):
                     visited.add((nx, ny))
                     queue.append((nx, ny, path + [(x, y)]))
 

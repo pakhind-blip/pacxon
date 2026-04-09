@@ -39,14 +39,22 @@ class GhostBouncer(Ghost):
         self.x += self.dx
         cx = int((self.x + self.width // 2) // self.block_size)
         cy = int((self.y + self.height // 2) // self.block_size)
-        if grid_manager.get_cell(cx, cy) == 1 or self.x <= 0 or self.x >= (grid_manager.width - 1) * self.block_size:
+        if (grid_manager.get_cell(cx, cy) == 1
+                # or self.x - self.width <= 0
+                # or self.x + self.width >= (grid_manager.width - 1) * self.block_size):
+                or self.x  <= 0
+                or self.x  >= (grid_manager.width - 1) * self.block_size):
             self.dx *= -1
             self.x += self.dx
 
         self.y += self.dy
         cx = int((self.x + self.width // 2) // self.block_size)
         cy = int((self.y + self.height // 2) // self.block_size)
-        if grid_manager.get_cell(cx, cy) == 1 or self.y <= 0 or self.y >= (grid_manager.height - 1) * self.block_size:
+        if (grid_manager.get_cell(cx, cy) == 1
+                # or self.y - self.height  <= 0
+                # or self.y + self.height >= (grid_manager.height - 1) * self.block_size):
+                or self.y   <= 0
+                or self.y  >= (grid_manager.height - 1) * self.block_size):
             self.dy *= -1
             self.y += self.dy
 
@@ -68,6 +76,7 @@ class GhostClimber(Ghost):
         self.grid_y = y
         self.current_dir = (1, 0)
         self._last_wall_count = -1
+        self.reverse = random.choice([True, False])
         self._history = deque(maxlen=12)
 
     # ------------------------------------------------------------------ helpers
@@ -125,15 +134,26 @@ class GhostClimber(Ghost):
         # Pick direction: forward must be open, wall must be on the right
         for attempt_dir in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
             adx, ady = attempt_dir
-            right_dx, right_dy = -ady, adx          # 90° right of direction
-            nx_fwd = self.grid_x + adx
-            ny_fwd = self.grid_y + ady
-            nx_right = self.grid_x + right_dx
-            ny_right = self.grid_y + right_dy
-            if (self._is_open(nx_fwd, ny_fwd, grid_manager) and
+            if not self.reverse:
+                right_dx, right_dy = -ady, adx          # 90° right of direction
+                nx_fwd = self.grid_x + adx
+                ny_fwd = self.grid_y + ady
+                nx_right = self.grid_x + right_dx
+                ny_right = self.grid_y + right_dy
+                if (self._is_open(nx_fwd, ny_fwd, grid_manager) and
                     grid_manager.get_cell(nx_right, ny_right) == 1):
-                self.current_dir = attempt_dir
-                return
+                    self.current_dir = attempt_dir
+                    return
+            else:
+                left_dx, left_dy = ady, -adx   # 90° left of direction
+                nx_fwd   = self.grid_x + adx
+                ny_fwd   = self.grid_y + ady
+                nx_left  = self.grid_x + left_dx
+                ny_left  = self.grid_y + left_dy
+                if (self._is_open(nx_fwd, ny_fwd, grid_manager) and
+                    grid_manager.get_cell(nx_left, ny_left) == 1):
+                    self.current_dir = attempt_dir
+                    return
 
         # Fallback: any open neighbour
         for attempt_dir in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
@@ -172,12 +192,22 @@ class GhostClimber(Ghost):
         # Right-hand rule in open space — wall stays on the RIGHT.
         # right of (dx,dy) = (-dy, dx)
         # Priority: turn right (into wall gap) → straight → turn left → reverse
-        priority_moves = [
-            (-dy,  dx),   # turn right — re-hug wall after open corner
-            ( dx,  dy),   # straight   — continue along wall
-            ( dy, -dx),   # turn left  — follow wall that bends left
-            (-dx, -dy),   # reverse    — last resort
-        ]
+        if not self.reverse:
+            # RIGHT-hand rule (clockwise)
+            priority_moves = [
+                (-dy,  dx),   # turn right
+                ( dx,  dy),   # straight
+                ( dy, -dx),   # turn left
+                (-dx, -dy),   # reverse
+            ]
+        else:
+            # LEFT-hand rule (counter-clockwise)
+            priority_moves = [
+                ( dy, -dx),   # turn left
+                ( dx,  dy),   # straight
+                (-dy,  dx),   # turn right
+                (-dx, -dy),   # reverse
+            ]
 
         recent = set(self._history)
         candidates = []
