@@ -42,14 +42,18 @@ class GridManager:
     def update_grid(self) -> None:
         grid_x, grid_y = self.player.get_grid_position()
 
+        if self.player.is_trailing and (grid_x, grid_y) in self.trail[:-1]:
+            self.gameEngine._player_hit()
+            return
         if self.grid[grid_y][grid_x] == 0:
             self.grid[grid_y][grid_x] = 2
             if self.start_position == (-1, -1):
                 self.start_position = (grid_x, grid_y)
+                self.player.is_trailing  = True
             self.trail.append((grid_x, grid_y))
-
-        if self.grid[grid_y][grid_x] == 1 and self.start_position != (-1, -1):
+        elif self.grid[grid_y][grid_x] == 1 and self.start_position != (-1, -1):
             end_position = (grid_x, grid_y)
+            self.player.is_trailing  = False
             self.flood_fill(end_position[0], end_position[1])
 
         self.calculate_coverage()

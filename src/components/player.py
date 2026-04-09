@@ -35,13 +35,22 @@ class Player(GameObject, Collision):
 
     def handle_input(self, keys) -> None:
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            self.direction = LEFT
-        elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            self.direction = RIGHT
-        elif keys[pygame.K_UP] or keys[pygame.K_w]:
-            self.direction = UP
-        elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            self.direction = DOWN
+            # print(self.is_trailing,self.direction)
+            if not (self.is_trailing and self.direction == RIGHT):
+                # print("l")
+                self.direction = LEFT
+
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            if not (self.is_trailing and self.direction == LEFT):
+                self.direction = RIGHT
+
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
+            if not (self.is_trailing and self.direction == DOWN):
+                self.direction = UP
+
+        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+            if not (self.is_trailing and self.direction == UP):
+                self.direction = DOWN
 
     def move(self) -> None:
         if self.direction == LEFT:
