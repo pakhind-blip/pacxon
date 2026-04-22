@@ -12,7 +12,7 @@ def main():
         (SCREEN_WIDTH, SCREEN_HEIGHT),
         pygame.RESIZABLE
     )
-    pygame.display.set_caption("PACXON")
+    pygame.display.set_caption("GRIDRUSH")
     clock = pygame.time.Clock()
     game_engine = GameEngine()
     game_engine.run(screen, clock, SCREEN_WIDTH, SCREEN_HEIGHT)

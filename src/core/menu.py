@@ -38,7 +38,7 @@ class Menu:
         cy = self.screen_height // 2
 
         f_title = pygame.font.Font(None, 72)
-        title = f_title.render("PACXON", True, (255, 230, 0))
+        title = f_title.render("GRIDRUSH", True, (255, 230, 0))
         self._center_text(title, cy - 180)
 
         f_opt = pygame.font.Font(None, 36)

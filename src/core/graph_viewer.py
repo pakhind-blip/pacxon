@@ -76,7 +76,7 @@ def show_graphs(csv_path="stats.csv"):
     fig = plt.figure(figsize=(9, 6))
     fig.patch.set_facecolor(BG)
     try:
-        fig.canvas.manager.set_window_title("PACXON — Statistics")
+        fig.canvas.manager.set_window_title("GRIDRUSH — Statistics")
     except Exception:
         pass
 
@@ -213,7 +213,7 @@ def _draw_summary(fig_ax, rows, cr, dr, mpatches):
     for i in range(13):
         fig_ax.axhline(i/12, color=GRID_LINE, linewidth=0.4, alpha=0.4)
 
-    fig_ax.text(0.5, 0.80, "PACXON", ha="center", va="center",
+    fig_ax.text(0.5, 0.80, "GRIDRUSH", ha="center", va="center",
                 fontsize=64, fontweight="bold", color=ACCENT,
                 transform=fig_ax.transAxes)
     fig_ax.text(0.5, 0.69, "SESSION  STATISTICS", ha="center", va="center",
