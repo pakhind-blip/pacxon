@@ -8,7 +8,7 @@ Metrics tracked:
   - Risk Duration       : seconds spent outside safe territory per trail
   - Ghost Proximity     : nearest-ghost distance at moment of trail close
   - Input Density       : direction changes made during a trail attempt
-  - Survival Time       : seconds between deaths / trail completions
+  - Survival Time       : seconds between deaths / trail completions 
 """
 
 import csv
