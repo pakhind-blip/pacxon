@@ -103,8 +103,8 @@ def show_graphs(csv_path="stats.csv"):
         buttons.append(btn)
 
     # ── Content area (below tabs) ─────────────────────────────────────────────
-    CONTENT_TOP    = TAB_Y - 0.01
-    CONTENT_BOTTOM = 0.06
+    CONTENT_TOP    = TAB_Y - 0.08
+    CONTENT_BOTTOM = 0.10
 
     # We'll store axes we create so we can clear them between tabs
     content_axes = []
@@ -274,22 +274,18 @@ def _no_data(ax):
 # ── Capture Efficiency ────────────────────────────────────────────────────────
 def _plot_capture(ax, cr):
     vals = [r["capture_efficiency"] for r in cr]
-    n    = len(vals)
-
-    def _bar_col(v):
-        if v >= 15: return ACCENT
-        if v >= 5:  return ACCENT2
-        return ACCENT3
-
+    n = len(vals)
     x = list(range(1, n + 1))
-    ax.bar(x, vals, color=[_bar_col(v) for v in vals],
+
+    col = lambda v: ACCENT if v >= 15 else ACCENT2 if v >= 5 else ACCENT3
+    ax.bar(x, vals, color=[col(v) for v in vals],
            width=0.8 if n <= 80 else 0.95, zorder=3, linewidth=0, alpha=0.85)
-    roll_win = max(3, n // 8)
-    roll = _rolling_mean(vals, roll_win)
-    ax.plot(x, roll, color=ACCENT, linewidth=2.0, zorder=5, label=f"trend (w={roll_win})")
+
+    w = max(3, n // 8)
+    ax.plot(x, _rolling_mean(vals, w), color=ACCENT, linewidth=2.0, zorder=5, label=f"trend (w={w})")
+
     avg = _mean(vals)
-    ax.axhline(avg, linestyle="--", linewidth=1.2,
-               color=ACCENT2, label=f"avg {avg:.1f}%", zorder=4)
+    ax.axhline(avg, ls="--", lw=1.2, color=ACCENT2, label=f"avg {avg:.1f}%", zorder=4)
     ax.set_ylim(0, max(vals) * 1.25 + 1)
     ax.legend(loc="upper right")
 

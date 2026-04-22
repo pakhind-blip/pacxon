@@ -10,7 +10,7 @@ import os as _os
 EFFECT_DURATION   = 480
 ITEM_LIFETIME     = 600
 SPAWN_INTERVAL    = 300
-SPAWN_CHANCE      = 1.00
+SPAWN_CHANCE      = 0.05
 STAR_CHANCE       = 0.05
 
 LIGHTNING = "lightning"
@@ -166,7 +166,7 @@ class ItemManager:
         if self._spawn_timer > 0:
             return
         self._spawn_timer = SPAWN_INTERVAL
-        chance = min(0.90, SPAWN_CHANCE + (level - 1) * 0.01)
+        chance = min(0.90, SPAWN_CHANCE + (level - 1) * 0.02)
         if random.random() >= chance:
             return
         gw, gh = grid_manager.width, grid_manager.height
