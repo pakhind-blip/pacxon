@@ -1,227 +1,162 @@
 import pygame
-import math
-import random
 
 class Menu:
     def __init__(self, screen, screen_width: int, screen_height: int):
         self.screen = screen
-        self.screen_width = screen_width
+        self.screen_width  = screen_width
         self.screen_height = screen_height
         self.selected_option = 0
-        self.options = ["Play", "Graph", "How to Play", "Quit"]
+        self.options = ["Play", "Index", "Graph", "How to Play", "Quit"]
         self.view = "MAIN"
+        self.index_tab = "GHOST"
+        self._ghost_scroll = 0
+        self._item_scroll  = 0
         self._tick = 0
 
-        # Particle field for background
-        random.seed(99)
-        self._particles = [
-            {
-                'x': random.uniform(0, screen_width),
-                'y': random.uniform(0, screen_height),
-                'vx': random.uniform(-0.3, 0.3),
-                'vy': random.uniform(-0.4, -0.1),
-                'r': random.uniform(1, 2.5),
-                'brightness': random.uniform(0.3, 1.0),
-            }
-            for _ in range(80)
-        ]
+    def on_resize(self, new_width: int, new_height: int) -> None:
+        self.screen_width  = new_width
+        self.screen_height = new_height
 
-        # Theme colors
-        self.C_BG      = (6, 6, 18)
-        self.C_ACCENT  = (0, 255, 200)
-        self.C_DIM     = (0, 120, 95)
-        self.C_TEXT    = (180, 200, 220)
-        self.C_SEL     = (255, 255, 255)
-        self.C_INACTIVE= (55, 65, 90)
-
-    # ── helpers ────────────────────────────────────────────────────────────
-
-    def _draw_particles(self):
-        for p in self._particles:
-            p['x'] += p['vx']
-            p['y'] += p['vy']
-            if p['y'] < -4:
-                p['y'] = self.screen_height + 4
-                p['x'] = random.uniform(0, self.screen_width)
-            alpha = int(180 * p['brightness'] * abs(math.sin(self._tick * 0.015 + p['x'])))
-            s = pygame.Surface((int(p['r'] * 2), int(p['r'] * 2)), pygame.SRCALPHA)
-            pygame.draw.circle(s, (0, 255, 200, alpha), (int(p['r']), int(p['r'])), int(p['r']))
-            self.screen.blit(s, (int(p['x'] - p['r']), int(p['y'] - p['r'])))
-
-    def _draw_grid_bg(self):
-        """Subtle animated perspective grid."""
-        col = (0, 30, 22)
-        spacing = 40
-        t = self._tick
-        for x in range(0, self.screen_width + spacing, spacing):
-            offset = int(6 * math.sin(t * 0.02 + x * 0.01))
-            pygame.draw.line(self.screen, col, (x, 0), (x, self.screen_height + offset), 1)
-        for y in range(0, self.screen_height + spacing, spacing):
-            offset = int(4 * math.sin(t * 0.02 + y * 0.01))
-            pygame.draw.line(self.screen, col, (0, y + offset), (self.screen_width, y + offset), 1)
-
-    # ── public ─────────────────────────────────────────────────────────────
-
-    def draw(self) -> None:
+    def draw(self):
         self._tick += 1
-        self.screen.fill(self.C_BG)
-        self._draw_grid_bg()
-        self._draw_particles()
+        self.screen.fill((20, 20, 30))
 
         if self.view == "MAIN":
-            self._draw_main_menu()
+            self._draw_main()
         elif self.view == "HOW_TO_PLAY":
             self._draw_how_to_play()
+        elif self.view == "INDEX":
+            self._draw_index()
         elif self.view == "GRAPH":
-            self._draw_graph_placeholder()
+            self._draw_graph()
 
-    def _draw_main_menu(self) -> None:
-        t = self._tick
-        cx = self.screen_width // 2
+    def _center_text(self, surf, y):
+        self.screen.blit(surf, (self.screen_width // 2 - surf.get_width() // 2, y))
 
-        # ── Decorative top bar
-        bar_alpha = int(120 + 60 * math.sin(t * 0.04))
-        bar = pygame.Surface((self.screen_width, 3), pygame.SRCALPHA)
-        bar.fill((0, 255, 200, bar_alpha))
-        self.screen.blit(bar, (0, 50))
+    def _draw_main(self):
+        cx = self.screen_width  // 2
+        cy = self.screen_height // 2
 
-        # ── Title PACXON with glow layers
-        font_title = pygame.font.Font(None, 110)
-        title_surf = font_title.render("PACXON", True, self.C_ACCENT)
-        tx = cx - title_surf.get_width() // 2
+        f_title = pygame.font.Font(None, 72)
+        title = f_title.render("PACXON", True, (255, 230, 0))
+        self._center_text(title, cy - 180)
 
-        # Multi-layer glow
-        for radius, alpha in [(8, 20), (4, 40), (2, 80)]:
-            glow = pygame.Surface(title_surf.get_size(), pygame.SRCALPHA)
-            glow.blit(title_surf, (0, 0))
-            glow.set_alpha(alpha)
-            self.screen.blit(glow, (tx - radius, 68 - radius))
-            self.screen.blit(glow, (tx + radius, 68 + radius))
+        f_opt = pygame.font.Font(None, 36)
+        for i, opt in enumerate(self.options):
+            color = (0, 255, 180) if i == self.selected_option else (160, 160, 160)
+            prefix = "> " if i == self.selected_option else "  "
+            surf = f_opt.render(prefix + opt, True, color)
+            self._center_text(surf, cy - 80 + i * 44)
 
-        # Main title
-        self.screen.blit(title_surf, (tx, 68))
+        f_hint = pygame.font.Font(None, 20)
+        hint = f_hint.render("UP/DOWN to navigate   SPACE/ENTER to select", True, (80, 80, 100))
+        self._center_text(hint, self.screen_height - 40)
 
-        # ── Subtitle / tagline
-        font_sub = pygame.font.Font(None, 22)
-        sub = font_sub.render("TERRITORY  ACQUISITION  PROTOCOL  v2.0", True, self.C_DIM)
-        self.screen.blit(sub, (cx - sub.get_width() // 2, 178))
+    def _draw_how_to_play(self):
+        cx = self.screen_width  // 2
+        y  = 60
 
-        # ── Divider
-        dw = 300
-        pygame.draw.line(self.screen, self.C_DIM, (cx - dw // 2, 200), (cx + dw // 2, 200), 1)
-        pygame.draw.circle(self.screen, self.C_ACCENT, (cx, 200), 4)
+        f_title = pygame.font.Font(None, 40)
+        title = f_title.render("HOW TO PLAY", True, (0, 255, 180))
+        self._center_text(title, y); y += 50
 
-        # ── Menu options
-        font_option = pygame.font.Font(None, 44)
-        for i, option in enumerate(self.options):
-            is_sel = (i == self.selected_option)
-            y_pos = 230 + i * 62
+        pygame.draw.line(self.screen, (0, 100, 80), (cx - 280, y), (cx + 280, y), 1); y += 12
 
-            if is_sel:
-                # Highlight panel
-                highlight = pygame.Surface((self.screen_width, 48), pygame.SRCALPHA)
-                highlight_alpha = int(25 + 15 * math.sin(t * 0.07))
-                highlight.fill((0, 255, 200, highlight_alpha))
-                self.screen.blit(highlight, (0, y_pos - 6))
-
-                # Left accent bar
-                pygame.draw.rect(self.screen, self.C_ACCENT, (0, y_pos - 6, 4, 48))
-
-                # Corner decorations
-                pygame.draw.line(self.screen, self.C_ACCENT,
-                                 (cx - 180, y_pos - 8), (cx - 160, y_pos - 8), 2)
-                pygame.draw.line(self.screen, self.C_ACCENT,
-                                 (cx + 160, y_pos - 8), (cx + 180, y_pos - 8), 2)
-
-                color = (255, 255, 255)
-                prefix, suffix = "▶ ", " ◀"
-            else:
-                color = self.C_INACTIVE
-                prefix, suffix = "  ", "  "
-
-            label = font_option.render(f"{prefix}{option.upper()}{suffix}", True, color)
-            self.screen.blit(label, (cx - label.get_width() // 2, y_pos))
-
-        # ── Bottom tagline
-        font_tiny = pygame.font.Font(None, 20)
-        if (t // 40) % 2 == 0:
-            hint = font_tiny.render("↑ ↓  NAVIGATE    ENTER / SPACE  SELECT", True, (40, 60, 55))
-            self.screen.blit(hint, (cx - hint.get_width() // 2, self.screen_height - 30))
-
-    def _draw_how_to_play(self) -> None:
-        cx = self.screen_width // 2
-        t = self._tick
-
-        # Panel background
-        panel = pygame.Surface((620, 320), pygame.SRCALPHA)
-        panel.fill((0, 20, 16, 200))
-        self.screen.blit(panel, (cx - 310, 120))
-        pygame.draw.rect(self.screen, self.C_DIM, (cx - 310, 120, 620, 320), 1)
-
-        font_title = pygame.font.Font(None, 56)
-        title = font_title.render("MISSION  OBJECTIVES", True, self.C_ACCENT)
-        self.screen.blit(title, (cx - title.get_width() // 2, 80))
-
-        pygame.draw.line(self.screen, self.C_DIM, (cx - 240, 140), (cx + 240, 140), 1)
-
-        font_text = pygame.font.Font(None, 28)
         instructions = [
-            ("MOVE",    "ARROW KEYS  /  WASD"),
-            ("CAPTURE", "Navigate empty space to claim territory"),
-            ("DANGER",  "Avoid ghosts touching you or your trail"),
-            ("WIN",     "Secure 80% of the map to advance"),
-            ("RESET",   "Press  R  to reset your position"),
+            ("ARROW / WASD", "Move your ship around the grid"),
+            ("EMPTY SPACE",  "Move into it to start laying a capture trail"),
+            ("REACH WALL",   "Return to a wall to capture the enclosed area"),
+            ("SELF-TRAIL",   "Crossing your own trail loses a life"),
+            ("GHOSTS",       "Contact loses a life; some curse or freeze you"),
+            ("TARGET: 80%",  "Capture 80% of the map to advance"),
+            ("ESC",          "Return to main menu"),
         ]
-        for i, (key, desc) in enumerate(instructions):
-            ky = 160 + i * 44
-            k_surf = font_text.render(key, True, self.C_ACCENT)
-            d_surf = font_text.render(desc, True, (160, 185, 175))
-            self.screen.blit(k_surf, (cx - 270, ky))
-            pygame.draw.line(self.screen, (0, 60, 50), (cx - 215, ky + 10), (cx - 200, ky + 10), 1)
-            self.screen.blit(d_surf, (cx - 185, ky))
+        f_key  = pygame.font.Font(None, 24)
+        f_desc = pygame.font.Font(None, 24)
+        for key, desc in instructions:
+            ks = f_key.render(key, True, (0, 220, 160))
+            ds = f_desc.render(desc, True, (200, 200, 200))
+            self.screen.blit(ks,  (cx - 280, y))
+            self.screen.blit(ds,  (cx - 60,  y))
+            y += 36
 
-        # Back hint
-        font_back = pygame.font.Font(None, 24)
-        if (t // 35) % 2 == 0:
-            back = font_back.render("[ ESC ]  TO RETURN", True, self.C_DIM)
-            self.screen.blit(back, (cx - back.get_width() // 2, 470))
+        y += 10
+        f_back = pygame.font.Font(None, 22)
+        back = f_back.render("ESC — BACK", True, (100, 100, 120))
+        self._center_text(back, y)
 
-    def _draw_graph_placeholder(self) -> None:
-        cx, cy = self.screen_width // 2, self.screen_height // 2
-        t = self._tick
+    def _draw_index(self):
+        cx = self.screen_width  // 2
+        y  = 60
 
-        # Panel
-        panel = pygame.Surface((580, 300), pygame.SRCALPHA)
-        panel.fill((0, 14, 10, 200))
-        self.screen.blit(panel, (cx - 290, cy - 130))
-        pygame.draw.rect(self.screen, self.C_DIM, (cx - 290, cy - 130, 580, 300), 1)
+        f_title = pygame.font.Font(None, 40)
+        title = f_title.render("INDEX", True, (0, 255, 180))
+        self._center_text(title, y); y += 46
 
-        font_title = pygame.font.Font(None, 52)
-        title = font_title.render("SYSTEM TELEMETRY", True, self.C_SEL)
-        self.screen.blit(title, (cx - title.get_width() // 2, cy - 100))
+        # Tab bar
+        for tab_name, tx in [("GHOST", cx - 100), ("ITEM", cx + 20)]:
+            col = (0, 255, 180) if self.index_tab == tab_name else (100, 100, 120)
+            ft = pygame.font.Font(None, 28)
+            ts = ft.render(tab_name, True, col)
+            self.screen.blit(ts, (tx, y))
+        y += 34
+        pygame.draw.line(self.screen, (0, 100, 80), (cx - 280, y), (cx + 280, y), 1); y += 10
 
-        # Fake animated graph bars
-        font_small = pygame.font.Font(None, 22)
-        labels = ["CPU", "MEM", "NET", "GPU", "I/O"]
-        for i, lbl in enumerate(labels):
-            bx = cx - 220 + i * 95
-            bh_max = 80
-            # animated bar height
-            h = int(bh_max * abs(math.sin(t * 0.04 + i * 1.2)))
-            by = cy + 30
+        GHOST_DATA = {
+            "GhostBouncer":    ("BOUNCER",     (255,  80, 160), "Ricochets off walls at high speed"),
+            "GhostClimber":    ("CLIMBER",     (255, 140,  20), "Hugs walls and traces their edges"),
+            "GhostDasher":     ("DASHER",      (255, 220,   0), "Wanders then snaps axis and dashes"),
+            "GhostReverser":   ("REVERSER",    (160, 255,   0), "Contact reverses your controls"),
+            "GhostFreezer":    ("FREEZER",     ( 30, 100, 220), "Charges up and fires a freeze pulse"),
+            "GhostInsider":    ("INSIDER",     (  0, 220, 255), "Spawns and bounces inside your territory"),
+            "GhostWatcher":    ("WATCHER",     (200,  50, 255), "Stationary; charges when it sees you"),
+            "GhostGatekeeper": ("GATEKEEPER",  (255,  30,  30), "Patrols the border, blocks your path"),
+            "GhostDecoy":      ("DECOY",       ( 50, 255,  80), "Hides as a wall tile, hits on reveal"),
+        }
+        ITEM_DATA = [
+            ("LIGHTNING",  (255, 220,  0), "Boosts your movement speed"),
+            ("SNOW",       ( 80, 180, 255), "Completely freezes all ghosts"),
+            ("SWORD",      (220, 100, 255), "Kill ghosts on contact"),
+            ("SLIME",      ( 50, 200,  50), "Slows all ghosts to 35% speed"),
+            ("HEART",      (255,  60, 100), "Restores one life (max 3)"),
+            ("STAR",       (255, 240,  80), "Activates all effects at once"),
+        ]
 
-            # Bar
-            pygame.draw.rect(self.screen, (0, 40, 30), (bx, cy - 40, 60, bh_max + 10))
-            pygame.draw.rect(self.screen, self.C_ACCENT, (bx, by - h, 60, h))
-            pygame.draw.rect(self.screen, (200, 255, 240), (bx, by - h, 60, 4))
+        f_name = pygame.font.Font(None, 24)
+        f_desc = pygame.font.Font(None, 20)
+        row_h  = 30
 
-            l = font_small.render(lbl, True, self.C_DIM)
-            self.screen.blit(l, (bx + 30 - l.get_width() // 2, by + 14))
+        if self.index_tab == "GHOST":
+            items = list(GHOST_DATA.values())
+        else:
+            items = [(n, c, d) for n, c, d in ITEM_DATA]
 
-        font_back = pygame.font.Font(None, 24)
-        if (t // 35) % 2 == 0:
-            back = font_back.render("[ ESC ]  TO RETURN", True, self.C_DIM)
-            self.screen.blit(back, (cx - back.get_width() // 2, cy + 130))
+        for i, entry in enumerate(items):
+            name, col, desc = entry
+            ns = f_name.render(name, True, col)
+            ds = f_desc.render(desc, True, (180, 180, 180))
+            self.screen.blit(ns, (cx - 280, y + i * row_h))
+            self.screen.blit(ds, (cx - 80,  y + i * row_h + 4))
+
+        f_hint = pygame.font.Font(None, 20)
+        hint = f_hint.render("LEFT/RIGHT switch tab   ESC back", True, (80, 80, 100))
+        self._center_text(hint, self.screen_height - 30)
+
+    def _draw_graph(self):
+        cx = self.screen_width  // 2
+        cy = self.screen_height // 2
+
+        f_title = pygame.font.Font(None, 40)
+        title = f_title.render("STATISTICS", True, (0, 255, 180))
+        self._center_text(title, cy - 60)
+
+        f_msg = pygame.font.Font(None, 30)
+        msg = f_msg.render("COMING SOON", True, (160, 160, 160))
+        self._center_text(msg, cy)
+
+        f_back = pygame.font.Font(None, 22)
+        back = f_back.render("ESC — BACK", True, (100, 100, 120))
+        self._center_text(back, cy + 50)
 
     def handle_input(self, event) -> str:
         if event.type != pygame.KEYDOWN:
@@ -229,6 +164,11 @@ class Menu:
         if self.view != "MAIN":
             if event.key in [pygame.K_ESCAPE, pygame.K_BACKSPACE]:
                 self.view = "MAIN"
+            elif self.view == "INDEX":
+                if event.key in [pygame.K_LEFT, pygame.K_a]:
+                    self.index_tab = "GHOST"
+                elif event.key in [pygame.K_RIGHT, pygame.K_d]:
+                    self.index_tab = "ITEM"
             return None
         if event.key in [pygame.K_UP, pygame.K_w]:
             self.selected_option = (self.selected_option - 1) % len(self.options)
@@ -236,8 +176,13 @@ class Menu:
             self.selected_option = (self.selected_option + 1) % len(self.options)
         elif event.key in [pygame.K_SPACE, pygame.K_RETURN]:
             choice = self.options[self.selected_option]
-            if choice == "Play":      return "start"
-            elif choice == "Graph":   self.view = "GRAPH"
+            if choice == "Play":          return "start"
             elif choice == "How to Play": self.view = "HOW_TO_PLAY"
-            elif choice == "Quit":    return "quit"
+            elif choice == "Index":
+                self.view = "INDEX"
+                self.index_tab = "GHOST"
+                self._ghost_scroll = 0
+                self._item_scroll  = 0
+            elif choice == "Graph":        return "graph"
+            elif choice == "Quit":        return "quit"
         return None
