@@ -2,7 +2,7 @@
 
 ## Project Description
 
-- **Project by:** pakhind-blip
+- **Project by:** Pakhin Daonan 6810545859
 - **Game Genre:** Arcade, Territory Capture
 
 PyXon is a 2D territory-capture arcade game built with Python and Pygame, inspired by the classic *Xonix / Qix* genre. You control a ship moving across a grid, drawing trails through empty space to claim territory. Close a loop by reconnecting to a wall and the enclosed area gets captured. Capture **80% of the grid** to clear the sector and advance.

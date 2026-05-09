@@ -100,9 +100,7 @@ The territory system also maps naturally onto interesting data — every trail i
 
 ## 3. UML Class Diagram
 
-![UML Class Diagram](descript/uml.pdf)
-
-**Submission:** [uml.pdf](descript/uml.pdf)
+[View UML Class Diagram (PDF)](descript/uml.pdf)
 
 ---
 
