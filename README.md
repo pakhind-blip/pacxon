@@ -2,6 +2,7 @@
 
 ## Project Description
 
+- **Project by:** pakhind-blip
 - **Game Genre:** Arcade, Territory Capture
 
 PyXon is a 2D territory-capture arcade game built with Python and Pygame, inspired by the classic *Xonix / Qix* genre. You control a ship moving across a grid, drawing trails through empty space to claim territory. Close a loop by reconnecting to a wall and the enclosed area gets captured. Capture **80% of the grid** to clear the sector and advance.
@@ -14,13 +15,12 @@ A built-in statistics system logs every trail attempt and death to a CSV file, v
 
 ## Installation
 
-Clone this project:
+To Clone this project:
 ```sh
 git clone https://github.com/pakhind-blip/pacxon.git
-cd pacxon
 ```
 
-Create and activate a Python virtual environment:
+To create and run Python Environment for this project:
 
 **Windows:**
 ```bat
@@ -38,9 +38,9 @@ pip install -r requirements.txt
 
 ---
 
-## Running the Game
+## Running Guide
 
-After activating the Python environment:
+After activating the Python Environment of this project, you can proceed to run the game by:
 
 **Windows:**
 ```bat
@@ -54,35 +54,33 @@ python3 main.py
 
 ---
 
-## Gameplay
+## Tutorial / Usage
 
-### Main Menu
+### Gameplay Screenshots
+
+#### Main Menu
 ![Main Menu](descript/gameplay/1.png)
 
-### Index / Navigation Screen
+#### Index / Navigation Screen
 ![Index Screen](descript/gameplay/2.png)
 
-### Level Index
+#### Level Index
 ![Level Index](descript/gameplay/3.png)
 
-### How to Play
+#### How to Play
 ![How to Play](descript/gameplay/4.png)
 
-### Sector Start
+#### Sector Start
 ![Sector Start](descript/gameplay/5.png)
 
-### In-Game (Territory Capture)
+#### In-Game (Territory Capture)
 ![In-Game Gameplay](descript/gameplay/6.png)
 
-### Active Gameplay (Balls in Motion)
+#### Active Gameplay (Balls in Motion)
 ![Active Gameplay](descript/gameplay/7.png)
 
-### Game Over Screen
+#### Game Over Screen
 ![Game Over](descript/gameplay/8.png)
-
----
-
-## Tutorial / Usage
 
 ### Controls
 
@@ -109,6 +107,33 @@ python3 main.py
 - Snow freezes all ghosts, Sword lets you kill them on contact — use them when surrounded
 - The Gatekeeper blocks the border while you have an active trail — watch for it before stepping out
 
+### Data Visualization
+
+From the main menu, select **Graph** to open the statistics window. It reads `stats.csv` and displays five tabbed charts.
+
+#### Overall Summary Dashboard
+![Overall Summary](descript/graphview/overall.png)
+
+#### Capture Efficiency (Bar Chart)
+![Capture Efficiency](descript/graphview/capture.png)
+
+#### Territory Density (Donut Chart)
+![Territory Density](descript/graphview/density.png)
+
+#### Risk Duration (Line Chart)
+![Risk Duration](descript/graphview/risk.png)
+
+#### Survival Time (Histogram)
+![Survival Time](descript/graphview/survival.png)
+
+| Tab | Content |
+|-----|---------|
+| 1 Summary | Session overview — trails, deaths, levels, averages |
+| 2 Capture | Capture efficiency per trail with trend line |
+| 3 Risk | Time spent outside safe territory per level |
+| 4 Density | Input complexity donut chart |
+| 5 Survival | Time-between-events histogram |
+
 ---
 
 ## Game Features
@@ -122,35 +147,6 @@ python3 main.py
 - **Ghost and item index** — in-game encyclopedia accessible from the main menu
 - **Statistics system** — CSV logging with 5 interactive chart tabs
 - **Sound system** — background music, SFX, and mute toggle
-
----
-
-## Data Visualization
-
-From the main menu, select **Graph** to open the statistics window. It reads `stats.csv` and displays five tabbed charts.
-
-### Overall Summary Dashboard
-![Overall Summary](descript/graphview/overall.png)
-
-### Capture Efficiency (Bar Chart)
-![Capture Efficiency](descript/graphview/capture.png)
-
-### Territory Density (Donut Chart)
-![Territory Density](descript/graphview/density.png)
-
-### Risk Duration (Line Chart)
-![Risk Duration](descript/graphview/risk.png)
-
-### Survival Time (Histogram)
-![Survival Time](descript/graphview/survival.png)
-
-| Tab | Content |
-|-----|---------|
-| 1 Summary | Session overview — trails, deaths, levels, averages |
-| 2 Capture | Capture efficiency per trail with trend line |
-| 3 Risk | Time spent outside safe territory per level |
-| 4 Density | Input complexity donut chart |
-| 5 Survival | Time-between-events histogram |
 
 ---
 
@@ -168,5 +164,6 @@ All planned features have been implemented.
 
 ## External Sources
 
-- **Sound effects and music** — Generated using Gemini AI
-- **Item icons** (lightning, snow, sword, slime, heart, star) — Generated using Gemini AI
+Acknowledge to:
+1. Sound effects and music — Generated using Gemini AI
+2. Item icons (lightning, snow, sword, slime, heart, star) — Generated using Gemini AI

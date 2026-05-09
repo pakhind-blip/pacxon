@@ -1,91 +1,94 @@
 # PyXon
 
-## Project Overview
+---
 
-**PyXon** is a 2D territory-capture arcade game built with Python and Pygame, inspired by the classic *Xonix / Qix* genre. The player controls a ship moving across a bordered grid, drawing trails through empty space to claim territory. Reconnecting to a wall flood-fills the enclosed area and scores it. The goal is to capture **80% of the grid** to clear the sector and advance.
+## 1. Project Overview
 
-Nine ghost types patrol the uncaptured space — each with its own movement pattern and rules. Some bounce at high speed, some follow wall edges, some freeze or curse the player on contact, and some hide inside already-captured territory waiting to ambush. If a ghost touches an active trail, it triggers an *infection* that crawls toward the player along the trail cells. Six power-up items drop onto the grid to provide temporary advantages. The game runs across 20 hand-crafted sectors with escalating ghost combinations.
+- **Project Name:** PyXon
 
-A built-in statistics system records every trail attempt and death to a CSV file, viewable as five interactive charts from the main menu.
+- **Brief Description:**
 
-### Problem the Project Solves
+  PyXon is a 2D territory-capture arcade game built with Python and Pygame, inspired by the classic *Xonix / Qix* genre. The player controls a ship moving across a bordered grid, drawing trails through empty space to claim territory. Reconnecting to a wall flood-fills the enclosed area and scores it. The goal is to capture **80% of the grid** to clear the sector and advance.
 
-Standard territory-capture games have one enemy type — the challenge is purely reflexes. PyXon gives each ghost a distinct behavior that the player has to read and respond to, turning each sector into a strategic puzzle rather than a pure speed test. The statistics system lets players review their own risk-taking behavior and see whether aggressive or cautious play actually produces better results.
+  Nine ghost types patrol the uncaptured space — each with its own movement pattern and rules. Some bounce at high speed, some follow wall edges, some freeze or curse the player on contact, and some hide inside already-captured territory waiting to ambush. If a ghost touches an active trail, it triggers an *infection* that crawls toward the player along the trail cells. Six power-up items drop onto the grid to provide temporary advantages. The game runs across 20 hand-crafted sectors with escalating ghost combinations. A built-in statistics system records every trail attempt and death to a CSV file, viewable as five interactive charts from the main menu.
 
-### Target Users
+- **Problem Statement:**
 
-Players who enjoy short arcade sessions with escalating difficulty, fans of classic grid games like Xonix or Qix, and anyone who likes roguelike-style challenge curves without long time commitments.
+  Standard territory-capture games have one enemy type — the challenge is purely reflexes. PyXon gives each ghost a distinct behavior that the player has to read and respond to, turning each sector into a strategic puzzle rather than a pure speed test. The statistics system lets players review their own risk-taking behavior and see whether aggressive or cautious play actually produces better results.
+
+- **Target Users:**
+
+  Players who enjoy short arcade sessions with escalating difficulty, fans of classic grid games like Xonix or Qix, and anyone who likes roguelike-style challenge curves without long time commitments.
+
+- **Key Features:**
+  - 9 ghost types with distinct AI behaviors
+  - 6 power-up items — Lightning, Snow, Sword, Slime, Heart, Star
+  - 20 hand-crafted sectors with increasing ghost combinations
+  - Trail infection mechanic — ghosts corrupt the active trail toward the player
+  - Freeze and curse status effects
+  - Statistics logger with 5 interactive chart tabs
+  - Sound system with music, SFX, and mute toggle
+
+- **Screenshots:**
+
+  ### Gameplay
+
+  #### Main Menu
+  ![Main Menu](descript/gameplay/1.png)
+
+  #### Index / Navigation Screen
+  ![Index Screen](descript/gameplay/2.png)
+
+  #### Level Index
+  ![Level Index](descript/gameplay/3.png)
+
+  #### How to Play
+  ![How to Play](descript/gameplay/4.png)
+
+  #### Sector Start
+  ![Sector Start](descript/gameplay/5.png)
+
+  #### In-Game (Territory Capture)
+  ![In-Game Gameplay](descript/gameplay/6.png)
+
+  #### Active Gameplay (Balls in Motion)
+  ![Active Gameplay](descript/gameplay/7.png)
+
+  #### Game Over Screen
+  ![Game Over](descript/gameplay/8.png)
+
+  ### Data Visualization
+
+  #### Overall Summary Dashboard
+  ![Overall Summary](descript/graphview/overall.png)
+
+  #### Capture Efficiency (Bar Chart)
+  ![Capture Efficiency](descript/graphview/capture.png)
+
+  #### Territory Density (Donut Chart)
+  ![Territory Density](descript/graphview/density.png)
+
+  #### Risk Duration (Line Chart)
+  ![Risk Duration](descript/graphview/risk.png)
+
+  #### Survival Time (Histogram)
+  ![Survival Time](descript/graphview/survival.png)
+
+- **Proposal:** [proposal.pdf](descript/proposal.pdf)
+
+- **YouTube Presentation:** *[Link to be added]*
 
 ---
 
-## Gameplay
+## 2. Concept
 
-### Main Menu
-![Main Menu](descript/gameplay/1.png)
-
-### Index / Navigation Screen
-![Index Screen](descript/gameplay/2.png)
-
-### Level Index
-![Level Index](descript/gameplay/3.png)
-
-### How to Play
-![How to Play](descript/gameplay/4.png)
-
-### Sector Start (Game Over – Jawed)
-![Sector Start](descript/gameplay/5.png)
-
-### In-Game (Territory Capture)
-![In-Game Gameplay](descript/gameplay/6.png)
-
-### Active Gameplay (Balls in Motion)
-![Active Gameplay](descript/gameplay/7.png)
-
-### Game Over Screen
-![Game Over](descript/gameplay/8.png)
-
----
-
-## Data Visualization
-
-### Overall Summary Dashboard
-![Overall Summary](descript/graphview/overall.png)
-
-### Capture Efficiency (Bar Chart)
-![Capture Efficiency](descript/graphview/capture.png)
-
-### Territory Density (Donut Chart)
-![Territory Density](descript/graphview/density.png)
-
-### Risk Duration (Line Chart)
-![Risk Duration](descript/graphview/risk.png)
-
-### Survival Time (Histogram)
-![Survival Time](descript/graphview/survival.png)
-
----
-
-## Key Features
-
-- 9 ghost types with distinct AI behaviors
-- 6 power-up items — Lightning, Snow, Sword, Slime, Heart, Star
-- 20 hand-crafted sectors with increasing ghost combinations
-- Trail infection mechanic — ghosts corrupt the active trail toward the player
-- Freeze and curse status effects
-- Statistics logger with 5 interactive chart tabs
-- Sound system with music, SFX, and mute toggle
-
----
-
-## Concept
-
-### Background
+### 2.1 Background
 
 PyXon was built to modernize a classic arcade formula. The original Xonix genre has one enemy type, which means the challenge never evolves — only the speed does. By giving each ghost its own ruleset, the player has to think differently in every sector. The trail infection mechanic came from the same instinct: instant death when a ghost touches the trail felt unfair, so instead it gives the player a brief window to escape.
 
 The territory system also maps naturally onto interesting data — every trail is a measurable risk decision, which makes the statistics genuinely worth reviewing.
 
-### Objectives
+### 2.2 Objectives
 
 - Build a complete arcade loop with a clear win and lose condition per sector
 - Make each of the nine ghost types feel meaningfully different
@@ -95,11 +98,15 @@ The territory system also maps naturally onto interesting data — every trail i
 
 ---
 
-## Object-Oriented Programming Implementation
-
-### UML Class Diagram
+## 3. UML Class Diagram
 
 ![UML Class Diagram](descript/uml.pdf)
+
+**Submission:** [uml.pdf](descript/uml.pdf)
+
+---
+
+## 4. Object-Oriented Programming Implementation
 
 ### Base Classes
 
@@ -196,7 +203,11 @@ Abstract interface with one method: `is_collision(x, y)`. Both `Player` and `Gho
 
 ---
 
-## Data Feature
+## 5. Statistical Data
+
+### 5.1 Data Recording Method
+
+Data is written to `stats.csv` in the project root in append mode. No new file is created per session — all runs accumulate in one file. Each row has a Unix timestamp so sessions can be filtered or separated if needed.
 
 Every trail closure and player death is logged as one row. A typical session of 30–40 trails produces roughly **30–50 rows**. This raw data drives all five visualization tabs.
 
@@ -208,7 +219,7 @@ Every trail closure and player death is logged as one row. A typical session of 
 | trail_close | 1 | 0.95 | 0.42 | 10.38 | 1 | 0.58 | 1777353501.70 |
 | player_death | 2 | 0.00 | 1.10 | 3.20 | 2 | 1.45 | 1777353512.00 |
 
-### Data Features
+### 5.2 Data Features
 
 | Feature | Objective | Source | Display |
 |---|---|---|---|
@@ -220,13 +231,7 @@ Every trail closure and player death is logged as one row. A typical session of 
 
 ---
 
-## Data Recording Method
-
-Data is written to `stats.csv` in the project root in append mode. No new file is created per session — all runs accumulate in one file. Each row has a Unix timestamp so sessions can be filtered or separated if needed.
-
----
-
-## What Changed from the Proposal
+## 6. Changed Proposed Features
 
 - **Ghost types expanded significantly** — the proposal defined only two ghost types (`Ghost_Chaser` and `Ghost_Bouncer`). The final game ships with nine distinct types: Bouncer, Climber CW/CCW, Dasher, Reverser, Freezer, Insider, Watcher, Gatekeeper, and Decoy. `Ghost_Chaser` was dropped entirely in favor of more interesting movement patterns.
 
@@ -244,15 +249,7 @@ Data is written to `stats.csv` in the project root in append mode. No new file i
 
 ---
 
-## External Sources
+## 7. External Sources
 
 - **Sound effects and music** — Generated using Gemini AI
 - **Item icons** (lightning, snow, sword, slime, heart, star) — Generated using Gemini AI
-
----
-
-## Links
-
-- **Proposal:** [proposal.pdf](descript/proposal.pdf)
-- **UML Diagram:** [uml.pdf](descript/uml.pdf)
-- **YouTube Presentation:** *[Link to be added]*

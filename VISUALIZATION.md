@@ -38,96 +38,61 @@ Open from the main menu by selecting **Graph**. Navigate between tabs by clickin
 
 ---
 
-## 1. Summary
+## Overall Look
+
+![Overall Dashboard](descript/graphview/overall.png)
+
+The statistics window is a standalone Matplotlib application launched as a subprocess from the main menu. It contains five tabs at the top — Summary, Capture, Risk, Density, and Survival — each displaying a different aspect of the player's recorded gameplay data. The window reads all rows from `stats.csv` automatically on launch and renders each tab on demand when the player clicks or presses the corresponding key (1–5).
+
+---
+
+## Page 1 — Summary
+
+### Component 1: Summary Stat Cards
 
 ![Summary Tab](descript/graphview/overall.png)
 
-A session overview displayed as six stat cards:
-
-| Card | Description |
-|------|-------------|
-| TRAILS | Total number of successfully closed trails |
-| DEATHS | Total lives lost |
-| LEVELS | Number of distinct sectors reached |
-| AVG CAPTURE | Mean capture efficiency per trail (%) |
-| AVG RISK | Mean time spent exposed per event (s) |
-| DEATH RATE | Percentage of all trail attempts that ended in death |
-
-A high death rate combined with low average capture indicates aggressive play that is not paying off. A low death rate with high average capture means the player is taking efficient, well-timed cuts.
-
-> **Source:** All rows in `stats.csv`. Trails from `trail_close` events, deaths from `player_death` events.
+The Summary tab displays six stat cards giving a session-level overview of the player's performance. The cards show total trails closed, total deaths, number of distinct levels reached, average capture efficiency per trail, average risk duration per event, and overall death rate. A high death rate combined with low average capture points to aggressive play that is not paying off, while a low death rate with high average capture indicates efficient, well-timed cuts through the grid.
 
 ---
 
-## 2. Capture Efficiency
+## Page 2 — Capture Efficiency
+
+### Component 1: Capture Efficiency Bar Chart
 
 ![Capture Efficiency](descript/graphview/capture.png)
 
-A bar chart showing how much territory each trail claimed, in chronological order.
-
-- **X-Axis:** Trail attempt number
-- **Y-Axis:** Area captured (% of playable grid)
-- **Bar colors:** Green (≥ 15%), yellow (5–14%), red (< 5%)
-- **Teal line:** Rolling average trend
-- **Dashed line:** Session average
-
-High early bars followed by smaller ones typically mean the player captured easy open areas first, then was forced into smaller riskier cuts. An upward trend line suggests improving strategy over the session.
-
-> **Source:** `capture_efficiency` column from `trail_close` rows. Logged in `GridManager.flood_fill()`.
+The Capture tab shows a bar chart of how much territory each trail claimed, plotted in chronological order. Bars are color-coded green for high captures (≥ 15%), yellow for moderate (5–14%), and red for low (< 5%), with a teal rolling average line and a dashed session average overlay. High early bars followed by smaller ones typically indicate the player cleared easy open areas first and was then forced into smaller, riskier cuts, while an upward trend line across the session suggests improving strategy.
 
 ---
 
-## 3. Risk Duration
+## Page 3 — Risk Duration
+
+### Component 1: Risk Duration Line Chart
 
 ![Risk Duration](descript/graphview/risk.png)
 
-A line chart showing how long the player stayed outside safe territory for each trail attempt, grouped by sector level.
-
-- **X-Axis:** Trail attempt number within the level
-- **Y-Axis:** Seconds spent outside safe territory
-- **Each line = one level**, color-coded
-- **Dotted line:** Overall session average
-
-Longer risk durations generally correlate with larger captures but also more deaths. Comparing lines across levels shows whether the player becomes bolder or more cautious as ghost difficulty increases.
-
-> **Source:** `risk_duration` column from all events. Logged by `StatsLogger` using `on_trail_start` and `on_trail_close` hooks in `Player`.
+The Risk tab displays a line chart of how long the player stayed outside safe territory for each trail attempt, with each sector level drawn as a separate color-coded line and a dotted overall session average for reference. Longer risk durations generally correlate with larger territory captures but also more deaths. Comparing lines across levels shows whether the player becomes bolder or more cautious as ghost combinations grow more difficult in later sectors.
 
 ---
 
-## 4. Input Density
+## Page 4 — Input Density
+
+### Component 1: Input Density Donut Chart
 
 ![Input Density](descript/graphview/density.png)
 
-A donut chart showing the proportion of trail attempts broken into three movement complexity categories:
-
-| Segment | Direction Changes | Meaning |
-|---------|------------------|---------|
-| Straight | 0–2 | Simple straight or single-turn cuts |
-| Moderate | 3–5 | Some mid-trail adjustments |
-| Complex | 6+ | Highly evasive, agile paths |
-
-The centre shows the total number of trail attempts. A large Complex slice means the player is actively dodging ghosts mid-trail. A dominant Straight slice suggests confident, direct play or a preference for safe predictable routes.
-
-> **Source:** `input_density` column from all events. Logged by `StatsLogger.on_direction_change()` called from `Player`.
+The Density tab presents a donut chart that categorizes every trail attempt by movement complexity — Straight (0–2 direction changes), Moderate (3–5), or Complex (6+) — with the total trail count shown at the centre. A large Complex slice means the player is actively dodging ghosts mid-trail and taking winding paths, while a dominant Straight slice suggests confident, direct play or a preference for safe, predictable routes along the grid edges.
 
 ---
 
-## 5. Survival Time
+## Page 5 — Survival Time
+
+### Component 1: Survival Time Histogram
 
 ![Survival Time](descript/graphview/survival.png)
 
-A histogram showing the distribution of time between consecutive events (trail closures and deaths).
-
-- **X-Axis:** Seconds between events
-- **Y-Axis:** Number of occurrences
-- **Bar colors:** Interpolated from red (low count) to blue (high count)
-- **Dashed line:** Mean
-- **Dotted line:** Median
-- Outliers above the 99th percentile are excluded to keep the chart readable
-
-A left-skewed distribution (many short intervals) suggests fast, frequent small captures or frequent deaths. A wider spread with a long tail means the player occasionally takes very long ambitious trails mixed with quick routine ones.
-
-> **Source:** `survival_time` column from all events. Logged as the time delta between consecutive events in `StatsLogger`.
+The Survival tab shows a histogram of the time elapsed between consecutive events (trail closures and deaths), with bar colors interpolated from red at low counts to blue at high counts, and dashed mean and dotted median reference lines. Outliers above the 99th percentile are excluded to keep the chart readable. A left-skewed distribution with many short intervals suggests fast, frequent small captures or frequent deaths, while a wider spread with a long right tail means the player occasionally takes very long, ambitious trails alongside quick routine ones.
 
 ---
 
