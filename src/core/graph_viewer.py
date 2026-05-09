@@ -76,7 +76,7 @@ def show_graphs(csv_path="stats.csv"):
     fig = plt.figure(figsize=(9, 6))
     fig.patch.set_facecolor(BG)
     try:
-        fig.canvas.manager.set_window_title("GRIDRUSH — Statistics")
+        fig.canvas.manager.set_window_title("PyXon — Statistics")
     except Exception:
         pass
 
@@ -213,7 +213,7 @@ def _draw_summary(fig_ax, rows, cr, dr, mpatches):
     for i in range(13):
         fig_ax.axhline(i/12, color=GRID_LINE, linewidth=0.4, alpha=0.4)
 
-    fig_ax.text(0.5, 0.80, "GRIDRUSH", ha="center", va="center",
+    fig_ax.text(0.5, 0.80, "PyXon", ha="center", va="center",
                 fontsize=64, fontweight="bold", color=ACCENT,
                 transform=fig_ax.transAxes)
     fig_ax.text(0.5, 0.69, "SESSION  STATISTICS", ha="center", va="center",
@@ -386,12 +386,18 @@ def _hex_to_rgb(h):
     return tuple(int(h[i:i+2], 16)/255 for i in (0, 2, 4))
 
 
+_CSV_FIELDS = ["event","level","capture_efficiency","risk_duration","ghost_proximity","input_density","survival_time","timestamp"]
+
 def _load_csv(path):
     if not os.path.exists(path):
         return []
     rows = []
     with open(path, newline="", encoding="utf-8") as f:
-        for row in csv.DictReader(f):
+        first = f.readline()
+        f.seek(0)
+        has_header = first.split(",")[0].strip() == "event"
+        reader = csv.DictReader(f) if has_header else csv.DictReader(f, fieldnames=_CSV_FIELDS)
+        for row in reader:
             for fld in ("capture_efficiency","risk_duration","ghost_proximity","survival_time","timestamp"):
                 try:    row[fld] = float(row[fld])
                 except: row[fld] = 0.0

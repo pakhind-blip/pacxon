@@ -302,10 +302,12 @@ class GhostFreezer(Ghost):
     def __init__(self, x, y, block_size):
         super().__init__(x, y, self.COLOR_NORMAL, block_size, speed=self.WANDER_SPEED)
         self.is_freezer=True
+        self._freeze_cooldown=0          # initialise here so it always exists
         a=random.uniform(0,2*math.pi)
         self.dx,self.dy=math.cos(a)*self.WANDER_SPEED,math.sin(a)*self.WANDER_SPEED
         self._state=self._WANDER; self._wander_timer=self.WANDER_FRAMES
         self._charge_timer=0; self._ring_radius=0.0
+        self._target_pgx=None; self._target_pgy=None   # snapshot of player pos at charge start
 
     def _dist_cells(self, gm):
         bs=self.block_size; gx=(self.x+self.width/2)/bs; gy=(self.y+self.height/2)/bs
@@ -323,6 +325,8 @@ class GhostFreezer(Ghost):
         self._bounce_move(gm)
         if self._wander_timer>0: self._wander_timer-=1
         elif self._dist_cells(gm)<=self.FREEZE_RANGE:
+            pgx,pgy=gm.player.get_grid_position()
+            self._target_pgx,self._target_pgy=pgx,pgy
             self._state=self._CHARGE; self._charge_timer=self.CHARGE_FRAMES; self._ring_radius=0.0
         else: self._wander_timer=40
 
@@ -337,11 +341,18 @@ class GhostFreezer(Ghost):
 
     def _fire_pulse(self, gm):
         p=gm.player; pgx,pgy=p.get_grid_position()
-        if (gm.get_cell(pgx,pgy)!=1 and not getattr(p,'is_frozen',False)
-                and not getattr(p,'is_cursed',False) and self._dist_cells(gm)<=self.FREEZE_RANGE):
+        # Use the position snapshot taken when the charge began so that moving
+        # away doesn't cancel the freeze and standing still doesn't re-trigger it.
+        tpgx = self._target_pgx if self._target_pgx is not None else pgx
+        tpgy = self._target_pgy if self._target_pgy is not None else pgy
+        gx=(self.x+self.width/2)/self.block_size; gy=(self.y+self.height/2)/self.block_size
+        dist=max(abs(gx-tpgx),abs(gy-tpgy))
+        if (gm.get_cell(tpgx,tpgy)!=1 and not getattr(p,'is_frozen',False)
+                and not getattr(p,'is_cursed',False) and dist<=self.FREEZE_RANGE):
             dur=self.FREEZE_DURATION//2 if getattr(p,'is_trailing',False) else self.FREEZE_DURATION
             p.is_frozen=True; p.freeze_timer=dur
         self._state=self._WANDER; self._wander_timer=self.WANDER_FRAMES; self._ring_radius=0.0
+        self._target_pgx=self._target_pgy=None
 
     def draw(self, surface, offset_y=0):
         self._tick += 1
