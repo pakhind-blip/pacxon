@@ -9,18 +9,19 @@ PyXon is a 2D territory-capture arcade game built with Python and Pygame, inspir
 
 Nine ghost types stand in your way — each with its own behavior. Some bounce unpredictably, some follow wall edges, some freeze or curse you on contact, and some lurk inside territory you already captured. If a ghost touches your active trail, it starts an infection crawling toward you. Six power-up items drop onto the grid to help even the odds. The game runs across 20 sectors with escalating ghost combinations.
 
-A built-in statistics system logs every trail attempt and death to a CSV file, viewable as five interactive charts from the main menu.
+**Statistics** window that graphs your performance after each session.
 
 ---
 
 ## Installation
 
-To Clone this project:
+To clone this project:
+
 ```sh
 git clone https://github.com/pakhind-blip/pacxon.git
 ```
 
-To create and run Python Environment for this project:
+To create and run a Python environment for this project:
 
 **Windows:**
 ```bat
@@ -36,11 +37,17 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+> **requirements.txt** contents:
+> ```
+> pygame==2.6.1
+> matplotlib==3.10.8
+> ```
+
 ---
 
 ## Running Guide
 
-After activating the Python Environment of this project, you can proceed to run the game by:
+After activating the Python environment, run the game with:
 
 **Windows:**
 ```bat
@@ -56,83 +63,24 @@ python3 main.py
 
 ## Tutorial / Usage
 
-### Gameplay Screenshots
+### Playing the game
 
-#### Main Menu
-![Main Menu](descript/gameplay/1.png)
+1. Run `main.py` — the main menu opens automatically.
+2. Use **↑ ↓** to navigate options, **Space / Enter** to select.
+3. Select **Play** to start — a sector briefing screen shows before each level.
+4. Move the ship across the grid to capture territory:
 
-#### Index / Navigation Screen
-![Index Screen](descript/gameplay/2.png)
+| Action | How |
+|--------|-----|
+| **Move** | Arrow Keys or WASD |
+| **Start trail** | Move onto empty space |
+| **Capture area** | Reconnect trail back to any wall |
+| **Confirm / Launch** | Space or Enter |
+| **Fullscreen** | F11 or Alt + Enter |
+| **Back to menu** | ESC |
 
-#### Level Index
-![Level Index](descript/gameplay/3.png)
-
-#### How to Play
-![How to Play](descript/gameplay/4.png)
-
-#### Sector Start
-![Sector Start](descript/gameplay/5.png)
-
-#### In-Game (Territory Capture)
-![In-Game Gameplay](descript/gameplay/6.png)
-
-#### Active Gameplay (Balls in Motion)
-![Active Gameplay](descript/gameplay/7.png)
-
-#### Game Over Screen
-![Game Over](descript/gameplay/8.png)
-
-### Controls
-
-| Key | Action |
-|-----|--------|
-| `Arrow Keys` / `WASD` | Move the player |
-| `Space` / `Enter` | Confirm / launch sector |
-| `ESC` | Pause → quit to menu |
-| `F11` / `Alt + Enter` | Toggle fullscreen |
-
-### How to Play
-
-1. Launch the game and select **Play** from the main menu
-2. Move onto empty space to start drawing a trail
-3. Reconnect to any wall to capture the enclosed area
-4. Avoid ghosts — contact loses a life, and ghosts that cross your trail start an infection
-5. Collect power-up items for temporary advantages
-6. Capture **80%** of the grid to clear the sector and advance to the next one
-
-### Tips
-
-- You cannot reverse direction while trailing — plan your path before stepping off the wall
-- The infection crawls along your trail toward you — get back to a wall fast to close it before it arrives
-- Snow freezes all ghosts, Sword lets you kill them on contact — use them when surrounded
-- The Gatekeeper blocks the border while you have an active trail — watch for it before stepping out
-
-### Data Visualization
-
-From the main menu, select **Graph** to open the statistics window. It reads `stats.csv` and displays five tabbed charts.
-
-#### Overall Summary Dashboard
-![Overall Summary](descript/graphview/overall.png)
-
-#### Capture Efficiency (Bar Chart)
-![Capture Efficiency](descript/graphview/capture.png)
-
-#### Territory Density (Donut Chart)
-![Territory Density](descript/graphview/density.png)
-
-#### Risk Duration (Line Chart)
-![Risk Duration](descript/graphview/risk.png)
-
-#### Survival Time (Histogram)
-![Survival Time](descript/graphview/survival.png)
-
-| Tab | Content |
-|-----|---------|
-| 1 Summary | Session overview — trails, deaths, levels, averages |
-| 2 Capture | Capture efficiency per trail with trend line |
-| 3 Risk | Time spent outside safe territory per level |
-| 4 Density | Input complexity donut chart |
-| 5 Survival | Time-between-events histogram |
+5. Press **ESC** during gameplay to return to the main menu.
+6. Select **Graph** on the main menu to open the statistics window.
 
 ---
 
@@ -165,5 +113,13 @@ All planned features have been implemented.
 ## External Sources
 
 Acknowledge to:
-1. Sound effects and music — Generated using Gemini AI
-2. Item icons (lightning, snow, sword, slime, heart, star) — Generated using Gemini AI
+
+1. **Pygame** — game loop, rendering, input, audio playback
+   https://www.pygame.org — LGPL 2.1
+
+2. **Matplotlib** — all 5 statistics charts (bar, line, donut, histogram, summary cards)
+   https://matplotlib.org — PSF / BSD
+
+3. **Sound effects and music** — Generated using Gemini AI
+
+4. **Item icons** (lightning, snow, sword, slime, heart, star) — Generated using Gemini AI
