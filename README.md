@@ -43,6 +43,81 @@ pip install -r requirements.txt
 > matplotlib==3.10.8
 > ```
 
+Project folder structure:
+
+```
+pacxon-main/
+├── DESCRIPTION.md
+├── LICENSE
+├── README.md
+├── requirements.txt
+├── VISUALIZATION.md
+│
+├── src/                         (main source folder)
+│   ├── main.py
+│   ├── stats.csv
+│   │
+│   ├── core/                    (core engine modules)
+│   │   ├── collision.py
+│   │   ├── game_engine.py
+│   │   ├── game_object.py
+│   │   ├── graph_viewer.py
+│   │   ├── grid_manager.py
+│   │   ├── item_manager.py
+│   │   ├── menu.py
+│   │   ├── sound_manager.py
+│   │   └── stats_logger.py
+│   │
+│   ├── components/              (player and ghost classes)
+│   │   ├── ghosts.py
+│   │   └── player.py
+│   │
+│   ├── items/                   (power-up icons)
+│   │   ├── heart.png
+│   │   ├── lightning.png
+│   │   ├── slime.png
+│   │   ├── snow.png
+│   │   ├── star.png
+│   │   └── sword.png
+│   │
+│   └── sound/                   (audio files)
+│       ├── capture.wav
+│       ├── death.wav
+│       ├── game_over.wav
+│       ├── game_theme.wav
+│       ├── infection_tick.wav
+│       ├── item_heart.wav
+│       ├── item_lightning.wav
+│       ├── item_slime.wav
+│       ├── item_snow.wav
+│       ├── item_spawn.wav
+│       ├── item_star.wav
+│       ├── item_sword.wav
+│       ├── level_complete.wav
+│       ├── theme.wav
+│       ├── trail.wav
+│       └── ui_click.wav
+│
+└── descript/                    (documentation assets)
+    ├── proposal.pdf
+    ├── uml.pdf
+    ├── gameplay/
+    │   ├── 1.png
+    │   ├── 2.png
+    │   ├── 3.png
+    │   ├── 4.png
+    │   ├── 5.png
+    │   ├── 6.png
+    │   ├── 7.png
+    │   └── 8.png
+    └── graphview/
+        ├── capture.png
+        ├── density.png
+        ├── overall.png
+        ├── risk.png
+        └── survival.png
+```
+
 ---
 
 ## Running Guide
