@@ -76,7 +76,7 @@
 
 - **Proposal:** [proposal.pdf](descript/proposal.pdf)
 
-- **YouTube Presentation:** *[Link to be added]*
+- **YouTube Presentation:** [https://www.youtube.com/watch?v=WToDY6b0ndI](https://www.youtube.com/watch?v=WToDY6b0ndI)
 
 ---
 
