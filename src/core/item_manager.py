@@ -171,7 +171,7 @@ class ItemManager:
             return
         gw, gh = grid_manager.width, grid_manager.height
         candidates = [(x, y) for y in range(1, gh - 1) for x in range(1, gw - 1)
-                      if grid_manager.get_cell(x, y) == 0]
+                      if grid_manager.get_cell(x, y) in (0, 1)]
         if not candidates:
             return
         gx, gy    = random.choice(candidates)

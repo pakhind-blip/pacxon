@@ -484,15 +484,6 @@ class GameEngine:
             p.freeze_timer -= 1
             if p.freeze_timer <= 0:
                 p.is_frozen = False
-            if p.is_trailing and self.grid_manager.trail:
-                sx, sy = self.grid_manager.trail[0]
-                for row in self.grid_manager.grid:
-                    for xi in range(len(row)):
-                        if row[xi] == 2: row[xi] = 0
-                self.grid_manager.trail.clear()
-                self.grid_manager.start_position = (-1, -1)
-                p.is_trailing = False
-                p.set_position(sx, sy)
 
         if getattr(p, 'is_cursed', False):
             p.curse_timer -= 1
@@ -641,9 +632,7 @@ class GameEngine:
     # ── collision handling ────────────────────────────────────────────────
     def handle_collisions(self) -> None:
         p = self.player
-        # While frozen the trail is being cleared and the player can't move —
-        # skip ALL collision checks to prevent unfair hits.
-        if p.is_iframe or getattr(p, 'sword_immune', False) or getattr(p, 'is_frozen', False):
+        if p.is_iframe or getattr(p, 'sword_immune', False):
             return
 
         can_infect = (self._infection is None)
@@ -698,17 +687,21 @@ class GameEngine:
                 if cooldown > 0:
                     g._freeze_cooldown = cooldown - 1
                     continue
-                if ov:
+                # Use a generous hitbox for the freezer (full block size)
+                freeze_hit = (abs(g.x + self.block_size / 2 - pcx) < self.block_size and
+                              abs(g.y + self.block_size / 2 - pcy) < self.block_size)
+                if freeze_hit:
                     if not getattr(p, 'is_frozen', False):
-                        # First touch: freeze the player and give the ghost a cooldown.
-                        # Do NOT kill here — the ghost must touch again AFTER the
-                        # freeze wears off (cooldown expires) to deal damage.
-                        p.is_frozen = True; p.freeze_timer = 300
-                        g._freeze_cooldown = 360   # slightly longer than freeze so
-                        self._add_flash((30, 100, 220), alpha=65, life=45); return  # player is safe while frozen
-                    # Player is frozen AND cooldown is 0 → second contact, deal damage
-                    self._player_hit(); return
-                if on_trail and not cursed and can_infect:
+                        # Only freeze when player is outside safe territory
+                        cell = self.grid_manager.get_cell(pgx, pgy)
+                        if cell != 1:
+                            p.is_frozen = True; p.freeze_timer = 300
+                            g._freeze_cooldown = 360
+                            self._add_flash((30, 100, 220), alpha=65, life=45)
+                    else:
+                        self._player_hit(); return
+                    continue
+                if on_trail and can_infect:
                     self._start_infection(gx, gy); return
                 continue
 
@@ -722,16 +715,18 @@ class GameEngine:
                         p.is_cursed = True; p.curse_timer = 240
                         g._curse_cooldown = 240
                         self._add_flash((160, 255, 0), alpha=65, life=45)
+                    else:
+                        self._player_hit(); return
                 continue
 
             if getattr(g, 'is_dasher', False) or getattr(g, 'is_watcher', False):
                 if ov:
                     self._player_hit(); return
-                if on_trail and not cursed and can_infect:
+                if on_trail and can_infect:
                     self._start_infection(gx, gy); return
                 continue
 
-            if on_trail and not cursed and can_infect:
+            if on_trail and can_infect:
                 self._start_infection(gx, gy); return
             if ov:
                 self._player_hit(); return
